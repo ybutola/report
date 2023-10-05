@@ -1,9 +1,12 @@
 package com.butola.report.service.worddoc;
 
+import com.butola.report.data.CashFlow;
+import com.butola.report.service.ExcelReader;
 import org.apache.poi.xwpf.usermodel.*;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTcBorders;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STBorder;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STMerge;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
@@ -12,8 +15,11 @@ import java.util.Locale;
 
 @Service
 public class WriteCashFlow {
-    public void writeCashFlow(XWPFDocument document) {
 
+    @Autowired
+    ExcelReader excelReader;
+
+    public void writeCashFlow(XWPFDocument document) {
         XWPFParagraph titleParagraph = document.createParagraph();
         titleParagraph.setAlignment(ParagraphAlignment.CENTER);
         XWPFRun titleRun = titleParagraph.createRun();
@@ -30,10 +36,11 @@ public class WriteCashFlow {
         populateTable(table);
     }
 
-    private static void populateTable(XWPFTable table) {
+    private void populateTable(XWPFTable table) {
         Date date = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd", Locale.US);
         String[] headers = {"", "      " + sdf.format(date) + "      ", "  ", " ", "", "Estimated"};
+/*
         String years = "5 years";
         String amt_1 = "31,243";
         String amt_2 = "25,303";
@@ -46,8 +53,15 @@ public class WriteCashFlow {
                 {"Furniture and Equipment", "$            " + amt_1, "  ", "$            " + amt_2, "     ", years},
                 {"Less Accumulated Depreciation", amt_3, "  ", amt_4, "     ", ""},
                 {"", "$            " + amt_5, "  ", "$            " + amt_6, "     ", ""}
-        };
+        };*/
 
+        CashFlow cashFlow = excelReader.readCashFlow("/files/test.xlsx");
+        String[][] data = {
+                {"", "2022", "     ", "2021", "     ", "Useful Lives"},
+                {"Furniture and Equipment", "$            " + cashFlow.getAmt_1(), "  ", "$            " + cashFlow.getAmt_2(), "     ", cashFlow.getYears()},
+                {"Less Accumulated Depreciation", cashFlow.getAmt_3(), "  ", cashFlow.getAmt_4(), "     ", ""},
+                {"", "$            " + cashFlow.getAmt_5(), "  ", "$            " + cashFlow.getAmt_6(), "     ", ""}
+        };
         populateHeaderData(headers, table);
         populateTableData(data, table);
     }
@@ -65,7 +79,6 @@ public class WriteCashFlow {
                 headerCell.getCTTc().addNewTcPr().addNewHMerge().setVal(STMerge.RESTART);
                 CTTcBorders cellBorders = headerCell.getCTTc().addNewTcPr().addNewTcBorders();
                 cellBorders.addNewBottom().setVal(STBorder.SINGLE);
-            //    xwpfRun.setUnderline(UnderlinePatterns.SINGLE);
             } else if (i == 2 || i == 3) {
                 headerCell.getCTTc().addNewTcPr().addNewHMerge().setVal(STMerge.CONTINUE);
             } else if (i == 5) {
@@ -113,17 +126,27 @@ public class WriteCashFlow {
                 {4, 1, 3}
         };
 
-        int numRows = myArray.length;
 
-        for (int row = 0; row < numRows; row++) {
-            int rowIndex = myArray[row][0];
-            int numCols = myArray[row].length;
+        for (int[] ints : myArray) {
+            int rowIndex = ints[0];
+            int numCols = ints.length;
             for (int col = 0; col < numCols - 1; col++) {
-                int columnIndex = myArray[row][col + 1];
+                int columnIndex = ints[col + 1];
                 XWPFTableCell cell = table.getRow(rowIndex).getCell(columnIndex);
                 CTTcBorders cellBorders = cell.getCTTc().addNewTcPr().addNewTcBorders();
                 cellBorders.addNewBottom().setVal(STBorder.SINGLE);
             }
         }
+//        int numRows = myArray.length;
+//        for (int row = 0; row < numRows; row++) {
+//            int rowIndex = myArray[row][0];
+//            int numCols = myArray[row].length;
+//            for (int col = 0; col < numCols - 1; col++) {
+//                int columnIndex = myArray[row][col + 1];
+//                XWPFTableCell cell = table.getRow(rowIndex).getCell(columnIndex);
+//                CTTcBorders cellBorders = cell.getCTTc().addNewTcPr().addNewTcBorders();
+//                cellBorders.addNewBottom().setVal(STBorder.SINGLE);
+//            }
+//        }
     }
 }

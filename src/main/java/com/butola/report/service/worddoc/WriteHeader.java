@@ -15,7 +15,7 @@ public class WriteHeader {
         writeCompanyName(document);
         writeCompanyCityNState(document);
         writeCompanyAddress(document);
-   //     writeCompanyLogo(document);
+        writeCompanyLogo(document);
     }
 
     private void writeCompanyName(XWPFDocument document) {
@@ -72,7 +72,7 @@ public class WriteHeader {
             ioe.printStackTrace();
         } catch (InvalidFormatException ife) {
             ife.printStackTrace();
-        }finally {
+        } finally {
             System.out.println("Keep writing to the document");
         }
     }
