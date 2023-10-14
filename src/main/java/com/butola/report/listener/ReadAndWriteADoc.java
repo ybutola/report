@@ -23,7 +23,7 @@ public class ReadAndWriteADoc {
     public XWPFDocument reandNWrite(int pageNumber) {
         try {
             // Input Word document file path
-            String inputFile = "files/RegularAudit.docx";
+            String inputFile = "files/RegularAuditPOC.docx";
 
             // Output Word document file path
             String outputFile = "outputwonder.docx";
@@ -48,7 +48,7 @@ public class ReadAndWriteADoc {
                     newParagraph.setNumID(paragraph.getNumID());
                 }
 
-                System.out.println(paragraph.getParagraphText());
+                //    System.out.println(paragraph.getParagraphText());
                 for (XWPFRun sourceRun : paragraph.getRuns()) {
                     stringBuilder.append(getTabsAndText(sourceRun));
                     XWPFRun newRun = newParagraph.createRun();
@@ -60,15 +60,16 @@ public class ReadAndWriteADoc {
                     newRun.setUnderline(sourceRun.getUnderline());
                     newRun.setColor(sourceRun.getColor());
                 }
-
             }
             //    }
             // Save the new document
 
             // replace the properties with data.
-            replacePropertyData(stringBuilder);
+            String content = replacePropertyData(stringBuilder);
+            System.out.println(content);
+
             // format  the content.
-            formatPropertyData(stringBuilder);
+            // formatPropertyData(stringBuilder);
             newDocument.write(fos);
             fos.close();
             System.out.println("Document copied and saved successfully.");
@@ -78,14 +79,24 @@ public class ReadAndWriteADoc {
         return null;
     }
 
-    private void replacePropertyData(StringBuilder stringBuilder) {
-        Property property = getDummyObject();
+    private String replacePropertyData(StringBuilder stringBuilder) {
+        Property property = getDummyObject(); // read property data from excel file
+
         String propertyContent = stringBuilder.toString();
-        propertyContent.replace("", "");
-        // read property data from excel file
-        // put that into an object
-        // replace
+        propertyContent = propertyContent.replace("@propertyDate", property.getPropertyDate());
+        propertyContent = propertyContent.replace("@propertyYear", property.getPropertyYear());
+        propertyContent = propertyContent.replace("@propertyPrYear", property.getPropertyPrYear());
+        propertyContent = propertyContent.replace("@propertyUsefulLive", property.getPropertyUsefulLive());
+        propertyContent = propertyContent.replace("@property_0_1", property.getProperty_0_1());
+        propertyContent = propertyContent.replace("@property_0_2", property.getProperty_0_2());
+        propertyContent = propertyContent.replace("@property_0_final", property.getProperty_0_final());
+        propertyContent = propertyContent.replace("@property_1_1", property.getProperty_1_1());
+        propertyContent = propertyContent.replace("@property_1_2", property.getProperty_1_2());
+        propertyContent = propertyContent.replace("@property_1_final", property.getProperty_1_final());
+
         // do we really need to put data into an object?
+
+        return propertyContent;
     }
 
     private void formatPropertyData(StringBuilder stringBuilder) {
@@ -108,7 +119,7 @@ public class ReadAndWriteADoc {
     }
 
     private void readPropertyContent(String content) {
-        private StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(content);
     }
 
