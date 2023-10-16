@@ -1,11 +1,9 @@
 package com.butola.report.service.exhibits;
 
-import com.butola.report.data.Assets;
-import com.butola.report.data.Liabilities;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import com.butola.report.data.Asset;
+import com.butola.report.data.Liability;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -19,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class ExhibitBGenerator {
@@ -35,7 +34,7 @@ public class ExhibitBGenerator {
                 inputStream = resource.getInputStream();
                 Workbook workbook = new XSSFWorkbook(inputStream);
                 Sheet sheet = workbook.getSheetAt(0); // Assuming you want to read the first sheet
-                generateExhibit(createAssetsList(sheet), createLiabilitiesList(sheet));
+                generateExhibit(createassetList(sheet), createLiabilitiesList(sheet));
             } catch (IOException ioe) {
                 ioe.printStackTrace();
             } finally {
@@ -44,121 +43,147 @@ public class ExhibitBGenerator {
         }
     }
 
-    private Map<String, Double> createAssetsList(Sheet sheet) {
-        Map<String, Double> assets = new HashMap<>();
+    private List<Asset> createassetList(Sheet sheet) {
+        List<Asset> assetList = new ArrayList<>();
+
         Row row = sheet.getRow(11);
         String assetItem = row.getCell(0).getStringCellValue();
 
+
         if (assetItem.contains("Cash")) {
-            assets.put("previousYearCashAndCashEquivalents", row.getCell(1).getNumericCellValue());
-            assets.put("currentYearCashAndCashEquivalents", row.getCell(5).getNumericCellValue());
+            Asset asset = new Asset();
+            asset.setItem("Cash And Cash Equivalents");
+            asset.setPreviousYearValue(row.getCell(1).getNumericCellValue());
+            asset.setCurrentYearValue(row.getCell(5).getNumericCellValue());
+            assetList.add(asset);
         }
 
         row = sheet.getRow(15);
         assetItem = row.getCell(0).getStringCellValue();
 
         if (assetItem.contains("Receivable")) {
-            assets.put("previousYearAccountReceivable", row.getCell(1).getNumericCellValue());
-            assets.put("currentYearAccountReceivable", row.getCell(5).getNumericCellValue());
+            Asset asset = new Asset();
+            asset.setItem("Accounts Receivable");
+            asset.setPreviousYearValue(row.getCell(1).getNumericCellValue());
+            asset.setCurrentYearValue(row.getCell(5).getNumericCellValue());
+            assetList.add(asset);
         }
 
         row = sheet.getRow(18);
         assetItem = row.getCell(0).getStringCellValue();
 
         if (assetItem.contains("Prepaid")) {
-            assets.put("previousYearPrepaidExpenses", row.getCell(1).getNumericCellValue());
-            assets.put("currentYearPrepaidExpenses", row.getCell(5).getNumericCellValue());
+            Asset asset = new Asset();
+            asset.setItem("Prepaid Expenses");
+            asset.setPreviousYearValue(row.getCell(1).getNumericCellValue());
+            asset.setCurrentYearValue(row.getCell(5).getNumericCellValue());
+            assetList.add(asset);
         }
         row = sheet.getRow(22);
         assetItem = row.getCell(0).getStringCellValue();
 
         if (assetItem.contains("Office")) {
-            assets.put("previousYearCLongFurnitureAndEquipment", row.getCell(1).getNumericCellValue());
-            assets.put("currentYearCLongFurnitureAndEquipment", row.getCell(5).getNumericCellValue());
+            Asset asset = new Asset();
+            asset.setItem("Furniture and Equipment - Net");
+            asset.setPreviousYearValue(row.getCell(1).getNumericCellValue());
+            asset.setCurrentYearValue(row.getCell(5).getNumericCellValue());
+            assetList.add(asset);
         }
 
         row = sheet.getRow(25);
         assetItem = row.getCell(0).getStringCellValue();
         if (assetItem.contains("Other Assets")) {
-            assets.put("previousYearCLongTermROU", row.getCell(1).getNumericCellValue());
-            assets.put("currentYearCLongTermROU", row.getCell(5).getNumericCellValue());
+            Asset asset = new Asset();
+            asset.setItem("ROU Asset");
+            asset.setPreviousYearValue(row.getCell(1).getNumericCellValue());
+            asset.setCurrentYearValue(row.getCell(5).getNumericCellValue());
+            assetList.add(asset);
         }
-        return assets;
+        return assetList;
     }
 
-    private Map<String, Double> createLiabilitiesList(Sheet sheet) {
-        Map<String, Double> liabilities = new HashMap<>();
+    private List<Liability> createLiabilitiesList(Sheet sheet) {
+        List<Liability> liabilities = new ArrayList<>();
         Row row = sheet.getRow(30);
         String item = row.getCell(0).getStringCellValue();
 
         if (item.contains("Accounts Payable")) {
-            liabilities.put("previousYearAccountsPayable", row.getCell(1).getNumericCellValue());
-            liabilities.put("currentYearAccountsPayable", row.getCell(5).getNumericCellValue());
+            Liability liability = new Liability();
+            liability.setItem("Accounts Payable");
+            liability.setPreviousYearValue(row.getCell(1).getNumericCellValue());
+            liability.setCurrentYearValue(row.getCell(5).getNumericCellValue());
+            liabilities.add(liability);
         }
 
         row = sheet.getRow(34);
         item = row.getCell(0).getStringCellValue();
 
-        if (item.contains("Accrued Salaries and Vacatio")) {
-            liabilities.put("previousYearAccuredSalariesAndVacation", row.getCell(1).getNumericCellValue());
-            liabilities.put("currentYearAccuredSalariesAndVacation", row.getCell(5).getNumericCellValue());
+        if (item.contains("Accrued Salaries and Vacation")) {
+            Liability liability = new Liability();
+            liability.setItem("Compensated Absences Payable");
+            liability.setPreviousYearValue(row.getCell(1).getNumericCellValue());
+            liability.setCurrentYearValue(row.getCell(5).getNumericCellValue());
+            liabilities.add(liability);
         }
 
         row = sheet.getRow(38);
         item = row.getCell(0).getStringCellValue();
 
         if (item.contains("Other Liabilities")) {
-            liabilities.put("previousYearOtherLiabilites", row.getCell(1).getNumericCellValue());
-            liabilities.put("currentYearOtherLiabilites", row.getCell(5).getNumericCellValue());
+            Liability liability = new Liability();
+            liability.setItem("Other Liabilities");
+            liability.setPreviousYearValue(row.getCell(1).getNumericCellValue());
+            liability.setCurrentYearValue(row.getCell(5).getNumericCellValue());
+            liabilities.add(liability);
         }
 
         return liabilities;
     }
 
-    private Assets createAssets(Sheet sheet) {
-        Assets assets = new Assets();
+    private Asset createasset(Sheet sheet) {
+        Asset asset = new Asset();
         Row row = sheet.getRow(11);
         String assetItem = row.getCell(0).getStringCellValue();
 
         if (assetItem.contains("Cash")) {
-            assets.setPreviousYearCashAndCashEquivalents(row.getCell(1).getNumericCellValue());
-            assets.setCurrentYearCashAndCashEquivalents(row.getCell(5).getNumericCellValue());
+            asset.setPreviousYearCashAndCashEquivalents(row.getCell(1).getNumericCellValue());
+            asset.setCurrentYearCashAndCashEquivalents(row.getCell(5).getNumericCellValue());
         }
 
         row = sheet.getRow(15);
         assetItem = row.getCell(0).getStringCellValue();
 
         if (assetItem.contains("Receivable")) {
-            assets.setPreviousYearAccountReceivable(row.getCell(1).getNumericCellValue());
-            assets.setCurrentYearAccountReceivable(row.getCell(5).getNumericCellValue());
+            asset.setPreviousYearAccountReceivable(row.getCell(1).getNumericCellValue());
+            asset.setCurrentYearAccountReceivable(row.getCell(5).getNumericCellValue());
         }
 
         row = sheet.getRow(18);
         assetItem = row.getCell(0).getStringCellValue();
 
         if (assetItem.contains("Prepaid")) {
-            assets.setPreviousYearPrepaidExpenses(row.getCell(1).getNumericCellValue());
-            assets.setCurrentYearPrepaidExpenses(row.getCell(5).getNumericCellValue());
+            asset.setPreviousYearPrepaidExpenses(row.getCell(1).getNumericCellValue());
+            asset.setCurrentYearPrepaidExpenses(row.getCell(5).getNumericCellValue());
         }
         row = sheet.getRow(22);
         assetItem = row.getCell(0).getStringCellValue();
 
         if (assetItem.contains("Office")) {
-            assets.setPreviousYearCLongFurnitureAndEquipment(row.getCell(1).getNumericCellValue());
-            assets.setCurrentYearCLongFurnitureAndEquipment(row.getCell(5).getNumericCellValue());
+            asset.setPreviousYearCLongFurnitureAndEquipment(row.getCell(1).getNumericCellValue());
+            asset.setCurrentYearCLongFurnitureAndEquipment(row.getCell(5).getNumericCellValue());
         }
 
         row = sheet.getRow(25);
         assetItem = row.getCell(0).getStringCellValue();
-        if (assetItem.contains("Other Assets")) {
-            assets.setPreviousYearCLongTermROU(row.getCell(1).getNumericCellValue());
-            assets.setCurrentYearCLongTermROU(row.getCell(5).getNumericCellValue());
+        if (assetItem.contains("Other asset")) {
+            asset.setPreviousYearCLongTermROU(row.getCell(1).getNumericCellValue());
+            asset.setCurrentYearCLongTermROU(row.getCell(5).getNumericCellValue());
         }
-        return assets;
+        return asset;
     }
 
-    private Liabilities createLiabilites(Sheet sheet) {
-        Liabilities liabilities = new Liabilities();
+    private Liability createLiabilites(Sheet sheet) {
+        Liability liabilities = new Liability();
         Row row = sheet.getRow(30);
         String liabilityItem = row.getCell(0).getStringCellValue();
 
@@ -185,7 +210,7 @@ public class ExhibitBGenerator {
         return liabilities;
     }
 
-    private void generateExhibit(Map<String, Double> assets, Map<String, Double> liabilities) {
+    private void generateExhibit(List<Asset> assetList, List<Liability> liabilities) {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("exhibitB");
 
@@ -200,24 +225,42 @@ public class ExhibitBGenerator {
         Cell cell_1 = row_1.createCell(1);
         cell_1.setCellValue("ASSETS");
 
+        // Merge cells from A1 to B1
+        CellRangeAddress mergedRegion = new CellRangeAddress(1, 1, 1, 4);
+        sheet.addMergedRegion(mergedRegion);
+        CellStyle cellStyle = workbook.createCellStyle();
+
+        cellStyle.setAlignment(HorizontalAlignment.CENTER);
+        cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+        cell_1.setCellStyle(cellStyle);
+
         Row row_2 = sheet.createRow(2);
         Cell row_2cell_1 = row_2.createCell(1);
         row_2cell_1.setCellValue("");
 
         Row row_3 = sheet.createRow(3);
         Cell row_3Cell_1 = row_3.createCell(1); // 9 is the cell column
-        row_3Cell_1.setCellValue("Current Assets");
+        row_3Cell_1.setCellValue("Current Assets:");
 
-        int rowNumber = 4;
-        assets.forEach((k, v) ->
-                System.out.println("Key =" + k + ", value = " + v)
-        );
+        CellRangeAddress currentAssetsMergeRegion = new CellRangeAddress(3, 3, 1, 4);
+        sheet.addMergedRegion(currentAssetsMergeRegion);
+
+        AtomicInteger rowNumber = new AtomicInteger(4);
+        assetList.stream().forEach((asset) -> {
+            Row assetRow = sheet.createRow(rowNumber.getAndIncrement());
+            Cell label = assetRow.createCell(2); // 9 is the cell column
+            label.setCellValue(asset.getItem());
+
+            Cell valuePrYear = assetRow.createCell(5); // 9 is the cell column
+            valuePrYear.setCellValue(asset.getPreviousYearValue());
+
+            Cell valueCurrentYear = assetRow.createCell(7); // 9 is the cell column
+            valueCurrentYear.setCellValue(asset.getCurrentYearValue());
+        });
         System.out.println("-------------------------------------");
-        liabilities.forEach((k, v) ->
-                System.out.println("Key =" + k + ", value = " + v)
-        );
 
-//        for (String asset : CURRENT_ASSETS) {
+
+//        for (String asset : CURRENT_asset) {
 //            Row newRow = sheet.createRow(rowNumber);
 //            Cell newRowCell_1 = row.createCell(1);
 //            newRowCell_1.setCellValue("");
@@ -232,13 +275,13 @@ public class ExhibitBGenerator {
 //            newRowCell_4.setCellValue("");
 //
 //            Cell newRowCell_5 = row.createCell(5);
-//            newRowCell_5.setCellValue(assets.getCurrentYearCashAndCashEquivalents());
+//            newRowCell_5.setCellValue(asset.getCurrentYearCashAndCashEquivalents());
 //
 //            Cell newRowCell_6 = row.createCell(6);
 //            newRowCell_6.setCellValue("");
 //
 //            Cell newRowCell_7 = row.createCell(5);
-//            newRowCell_7.setCellValue(assets.getPreviousYearCashAndCashEquivalents());
+//            newRowCell_7.setCellValue(asset.getPreviousYearCashAndCashEquivalents());
 //
 //            rowNumber++;
 //        }
