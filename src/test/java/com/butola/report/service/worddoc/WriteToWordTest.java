@@ -22,6 +22,9 @@ class WriteToWordTest {
     private ExcelReader excelReader;
 
     @MockBean
+    private WriteCashFlow writeCashFlow;
+
+    @MockBean
     private WriteHeader writeHeader;
 
     @Autowired

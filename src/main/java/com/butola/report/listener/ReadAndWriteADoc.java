@@ -62,14 +62,10 @@ public class ReadAndWriteADoc {
                 }
             }
             //    }
-            // Save the new document
 
-            // replace the properties with data.
             String content = replacePropertyData(stringBuilder);
             System.out.println(content);
-
-            // format  the content.
-            // formatPropertyData(stringBuilder);
+            formatPropertyData(content);
             newDocument.write(fos);
             fos.close();
             System.out.println("Document copied and saved successfully.");
@@ -83,23 +79,21 @@ public class ReadAndWriteADoc {
         Property property = getDummyObject(); // read property data from excel file
 
         String propertyContent = stringBuilder.toString();
-        propertyContent = propertyContent.replace("@propertyDate", property.getPropertyDate());
-        propertyContent = propertyContent.replace("@propertyYear", property.getPropertyYear());
-        propertyContent = propertyContent.replace("@propertyPrYear", property.getPropertyPrYear());
-        propertyContent = propertyContent.replace("@propertyUsefulLive", property.getPropertyUsefulLive());
-        propertyContent = propertyContent.replace("@property_0_1", property.getProperty_0_1());
-        propertyContent = propertyContent.replace("@property_0_2", property.getProperty_0_2());
-        propertyContent = propertyContent.replace("@property_0_final", property.getProperty_0_final());
-        propertyContent = propertyContent.replace("@property_1_1", property.getProperty_1_1());
-        propertyContent = propertyContent.replace("@property_1_2", property.getProperty_1_2());
-        propertyContent = propertyContent.replace("@property_1_final", property.getProperty_1_final());
-
-        // do we really need to put data into an object?
+        propertyContent = propertyContent.replace("propertyDate", property.getPropertyDate());
+        propertyContent = propertyContent.replace("propertyYear", property.getPropertyYear());
+        propertyContent = propertyContent.replace("propertyPrYear", property.getPropertyPrYear());
+        propertyContent = propertyContent.replace("propertyUsefulLive", property.getPropertyUsefulLive());
+        propertyContent = propertyContent.replace("property_0_1", property.getProperty_0_1());
+        propertyContent = propertyContent.replace("property_0_2", property.getProperty_0_2());
+        propertyContent = propertyContent.replace("property_0_final", property.getProperty_0_final());
+        propertyContent = propertyContent.replace("property_1_1", property.getProperty_1_1());
+        propertyContent = propertyContent.replace("property_1_2", property.getProperty_1_2());
+        propertyContent = propertyContent.replace("property_1_final", property.getProperty_1_final());
 
         return propertyContent;
     }
 
-    private void formatPropertyData(StringBuilder stringBuilder) {
+    private void formatPropertyData(String propertyContent) {
 
     }
 

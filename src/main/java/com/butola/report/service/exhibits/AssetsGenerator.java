@@ -2,6 +2,8 @@ package com.butola.report.service.exhibits;
 
 import com.butola.report.data.Asset;
 import com.butola.report.data.Liability;
+import com.butola.report.utility.Style;
+import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -16,9 +18,8 @@ import java.util.concurrent.atomic.DoubleAdder;
 
 @Service
 public class AssetsGenerator {
-    public void generateAssets(List<Asset> assetList) {
-        Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet("exhibitB");
+    public void generateAssets(List<Asset> assetList,Workbook workbook, Sheet sheet) {
+        setColumnWidth(sheet);
         generateHeader(workbook, sheet);
         Asset shortTermAsset = generateShortTermAssets(workbook, sheet, assetList);
         generateLongTermAssets(shortTermAsset, workbook, sheet, assetList);
@@ -30,10 +31,16 @@ public class AssetsGenerator {
         }
     }
 
-    private void generateHeader(Workbook workbook, Sheet sheet) {
+    private void setColumnWidth(Sheet sheet){
+        sheet.setColumnWidth(0, 2 * 256);
+        sheet.setColumnWidth(1, 2 * 256);
+        sheet.setColumnWidth(2, 2 * 256);
+        sheet.setColumnWidth(3, 2 * 256);
+        sheet.setColumnWidth(4, 45 * 256);
         sheet.setColumnWidth(5, 12 * 256);
         sheet.setColumnWidth(7, 12 * 256);
-
+    }
+    private void generateHeader(Workbook workbook, Sheet sheet) {
         CellStyle bottomBorderStyle = workbook.createCellStyle();
         bottomBorderStyle.setBorderBottom(BorderStyle.THIN);
         bottomBorderStyle.setAlignment(HorizontalAlignment.CENTER);
@@ -55,9 +62,9 @@ public class AssetsGenerator {
         CellRangeAddress mergedRegion = new CellRangeAddress(1, 1, 1, 4);
         sheet.addMergedRegion(mergedRegion);
         CellStyle cellStyle = workbook.createCellStyle();
-
         cellStyle.setAlignment(HorizontalAlignment.CENTER);
         cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+        cellStyle.setFont(Style.getUnderlineFont(workbook));
         cell_1.setCellStyle(cellStyle);
     }
 

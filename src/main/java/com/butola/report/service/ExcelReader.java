@@ -80,19 +80,21 @@ public class ExcelReader {
         return new CashFlow();
     }
 
-    private String getCellValue(Cell cell) {
+    public static String getCellValue(Cell cell) {
         String value = "";
-        switch (cell.getCellType()) {
-            case STRING:
-                value = cell.getStringCellValue();
-                break;
-            case NUMERIC:
-                value = String.valueOf(cell.getNumericCellValue());
-                value = value.substring(0, value.length() - 2);
-                break;
-            default:
-                System.out.print("\t");
-                break;
+        if (null != cell) {
+            switch (cell.getCellType()) {
+                case STRING:
+                    value = cell.getStringCellValue();
+                    break;
+                case NUMERIC:
+                    value = String.valueOf(cell.getNumericCellValue());
+                  //  value = value.substring(0, value.length() - 2);
+                    break;
+                default:
+                    System.out.print("\t");
+                    break;
+            }
         }
         return value;
     }

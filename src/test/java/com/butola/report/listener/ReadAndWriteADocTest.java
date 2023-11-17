@@ -17,13 +17,7 @@ class ReadAndWriteADocTest {
 
     @Test
     void testWriteHeaderParagraph() throws Exception {
-        String wordFilePath = "testoutput22.docx";
         XWPFDocument document =  readAndWriteADoc.reandNWrite(1);
-
-//
-//        FileOutputStream outputStream = new FileOutputStream(wordFilePath);
-//        document.write(outputStream);
-//        outputStream.close();
     }
 }
 

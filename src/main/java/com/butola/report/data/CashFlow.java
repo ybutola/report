@@ -1,12 +1,15 @@
 package com.butola.report.data;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Setter
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class CashFlow {
-
     private String years = "5 years";
     private String amt_1 = "31,243";
     private String amt_2 = "25,303";

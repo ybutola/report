@@ -40,20 +40,6 @@ public class WriteCashFlow {
         Date date = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd", Locale.US);
         String[] headers = {"", "      " + sdf.format(date) + "      ", "  ", " ", "", "Estimated"};
-/*
-        String years = "5 years";
-        String amt_1 = "31,243";
-        String amt_2 = "25,303";
-        String amt_3 = "11,172";
-        String amt_4 = "5,550";
-        String amt_5 = "20,071";
-        String amt_6 = "19,753";
-        String[][] data = {
-                {"", "2022", "     ", "2021", "     ", "Useful Lives"},
-                {"Furniture and Equipment", "$            " + amt_1, "  ", "$            " + amt_2, "     ", years},
-                {"Less Accumulated Depreciation", amt_3, "  ", amt_4, "     ", ""},
-                {"", "$            " + amt_5, "  ", "$            " + amt_6, "     ", ""}
-        };*/
 
         CashFlow cashFlow = excelReader.readCashFlow("/files/test.xlsx");
         String[][] data = {
