@@ -1,7 +1,9 @@
-package com.butola.report.service.exhibits;
+package com.butola.report.service.exhibits.exhibitb;
 
 import com.butola.report.data.Asset;
 import com.butola.report.data.Liability;
+import com.butola.report.service.exhibits.exhibitb.AssetsGenerator;
+import com.butola.report.service.exhibits.exhibitb.LiabilitiesGenerator;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,28 +27,34 @@ public class ExhibitBGenerator {
     @Autowired
     LiabilitiesGenerator liabilitiesGenerator;
 
-    public void readTriaBalance() throws IOException {
+    public void generateExhibitB(Workbook auditReport) throws IOException {
+        try {
+            Sheet sheet = readTrialBalance();
+            Sheet exhibitBsheet = auditReport.createSheet("exhibitB");
+            assetsGenerator.generateAssets(createAssetList(sheet), auditReport, exhibitBsheet);
+            liabilitiesGenerator.generateLiabilities(createLiabilitiesList(sheet), auditReport, exhibitBsheet);
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+    }
+
+    public Sheet readTrialBalance() throws IOException {
         String excelFilePath = "files/MetronetTB.xlsx";
         Resource resource = resourceLoader.getResource("classpath:" + excelFilePath);
-
+        Sheet sheet = null;
         if (resource.exists()) {
             InputStream inputStream = null;
             try {
                 inputStream = resource.getInputStream();
                 Workbook workbook = new XSSFWorkbook(inputStream);
-                Sheet sheet = workbook.getSheetAt(0);
-
-                Workbook exhibitBworkbook = new XSSFWorkbook();
-                Sheet exhibitBsheet = exhibitBworkbook.createSheet("exhibitB");
-
-                assetsGenerator.generateAssets(createAssetList(sheet), exhibitBworkbook, exhibitBsheet);
-                liabilitiesGenerator.generateLiabilities(createLiabilitiesList(sheet), exhibitBworkbook, exhibitBsheet);
+                sheet = workbook.getSheetAt(1);
             } catch (IOException ioe) {
                 ioe.printStackTrace();
             } finally {
                 inputStream.close();
             }
         }
+        return sheet;
     }
 
     private List<Asset> createAssetList(Sheet sheet) {

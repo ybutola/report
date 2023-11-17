@@ -2,6 +2,9 @@ package com.butola.report.service.exhibits;
 
 import java.io.IOException;
 
+import com.butola.report.service.exhibits.exhibitb.AssetsGenerator;
+import com.butola.report.service.exhibits.exhibitb.ExhibitBGenerator;
+import com.butola.report.service.exhibits.exhibitb.LiabilitiesGenerator;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

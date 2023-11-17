@@ -1,4 +1,4 @@
-package com.butola.report.service.exhibits;
+package com.butola.report.service.exhibits.exhibitb;
 
 import com.butola.report.data.Asset;
 import com.butola.report.data.Liability;
