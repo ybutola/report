@@ -9,12 +9,14 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class ExhibitAGenerator {
     @Autowired
     ResourceLoader resourceLoader;
@@ -57,7 +59,7 @@ public class ExhibitAGenerator {
 
     private List<Revenue> createRevenueList(Sheet sheet) {
         List<Revenue> revenueList = new ArrayList<>();
-        Row row = sheet.getRow(47);
+        Row row = sheet.getRow(45);
         String assetItem = row.getCell(0).getStringCellValue();
 
         if (assetItem.contains("State Grants")) {
@@ -72,20 +74,20 @@ public class ExhibitAGenerator {
 
     private List<Expense> createExpenseList(Sheet sheet) {
         List<Expense> expenseList = new ArrayList<>();
-        updateExpenseList(expenseList, "Personnel Expense", "Personnel Expense", sheet, 55);
-        updateExpenseList(expenseList, "Contract Services", "Contract Services", sheet, 58);
-        updateExpenseList(expenseList, "CE Scholarship", "CE Scholarship", sheet, 61);
-        updateExpenseList(expenseList, "Professional Fees", "Professional Fees", sheet, 66);
-        updateExpenseList(expenseList, "Rent", "Rent", sheet, 69);
-        updateExpenseList(expenseList, "Supplies and Equiptment", "Supplies and Equiptment", sheet, 74);
-        updateExpenseList(expenseList, "Telephone", "Telephone", sheet, 78);
-        updateExpenseList(expenseList, "Postage", "Postage", sheet, 81);
-        updateExpenseList(expenseList, "Insurance", "Insurance", sheet, 84);
-        updateExpenseList(expenseList, "Travel & Meetings", "Travel & Meetings", sheet, 90);
-        updateExpenseList(expenseList, "Training", "Training", sheet, 94);
-        updateExpenseList(expenseList, "Member Services", "Member Services", sheet, 98);
-        updateExpenseList(expenseList, "Depreciation", "Depreciation", sheet, 101);
-        updateExpenseList(expenseList, "Miscellaneous", "Miscellaneous", sheet, 105);
+        updateExpenseList(expenseList, "Personnel Expense", "Personnel Expense", sheet, 53);
+        updateExpenseList(expenseList, "Contract Services", "Contract Services", sheet, 56);
+        updateExpenseList(expenseList, "CE Scholarship", "CE Scholarship", sheet, 59);
+        updateExpenseList(expenseList, "Professional Fees", "Professional Fees", sheet, 64);
+        updateExpenseList(expenseList, "Rent", "Rent", sheet, 68);
+        updateExpenseList(expenseList, "Supplies and Equiptment", "Supplies and Equiptment", sheet, 72);
+        updateExpenseList(expenseList, "Telephone", "Telephone", sheet, 76);
+        updateExpenseList(expenseList, "Postage", "Postage", sheet, 79);
+        updateExpenseList(expenseList, "Insurance", "Insurance", sheet, 82);
+        updateExpenseList(expenseList, "Travel & Meetings", "Travel & Meetings", sheet, 88);
+        updateExpenseList(expenseList, "Training", "Training", sheet, 92);
+        updateExpenseList(expenseList, "Member Services", "Member Services", sheet, 96);
+        updateExpenseList(expenseList, "Depreciation", "Depreciation", sheet, 99);
+        updateExpenseList(expenseList, "Miscellaneous", "Miscellaneous", sheet, 103);
         return expenseList;
     }
 
