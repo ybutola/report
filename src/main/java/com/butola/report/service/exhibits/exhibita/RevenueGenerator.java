@@ -64,8 +64,17 @@ public class RevenueGenerator {
                     thisYearsRevenue.add(currentYearValue);
                     previousYearsRevenue.add(previousYearValue);
 
-                    valueCurrentYear.setCellValue("$     " + df.format(currentYearValue));
-                    valuePrYear.setCellValue("$     " + df.format(previousYearValue));
+                    if (currentYearValue == 0.0){
+                        valueCurrentYear.setCellValue(" -  ");
+                    }else {
+                        valueCurrentYear.setCellValue("$     " + df.format(currentYearValue));
+                    }
+
+                    if (previousYearValue==0.0){
+                        valuePrYear.setCellValue("-" );
+                    }else {
+                        valuePrYear.setCellValue("$     " + df.format(previousYearValue));
+                    }
                 });
 
         CellStyle topBorderStyle = workbook.createCellStyle();
@@ -73,7 +82,7 @@ public class RevenueGenerator {
         topBorderStyle.setAlignment(HorizontalAlignment.RIGHT);
         Row totalValueRow = sheet.createRow(rowNumber.getAndIncrement());
         Cell tcyItemCell = totalValueRow.createCell(2);
-        tcyItemCell.setCellValue("Total Current Assets");
+        tcyItemCell.setCellValue("Total Operating Revenues");
 
         Cell tstaCell_3 = totalValueRow.createCell(3);
         tstaCell_3.setCellValue(df.format(thisYearsRevenue.doubleValue()));

@@ -30,7 +30,7 @@ public class ExhibitAGenerator {
     public void generateExhibitA(Workbook auditReport) throws IOException {
         try {
             Sheet sheet = readTrialBalance();
-            Sheet exhibitAsheet = auditReport.createSheet("exhibitA");
+            Sheet exhibitAsheet = auditReport.createSheet("exhibit A");
             revenueGenerator.generateRevenue(createRevenueList(sheet), auditReport, exhibitAsheet);
             expenseGenerator.generateExpense(createExpenseList(sheet), auditReport, exhibitAsheet);
         } catch (IOException ioe) {

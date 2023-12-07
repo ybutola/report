@@ -30,7 +30,10 @@ public class ExhibitBGenerator {
     public void generateExhibitB(Workbook auditReport) throws IOException {
         try {
             Sheet sheet = readTrialBalance();
-            Sheet exhibitBsheet = auditReport.createSheet("exhibitB");
+            Sheet exhibitBsheet = auditReport.createSheet("exhibit B");
+//            FormulaEvaluator evaluator = auditReport.getCreationHelper().createFormulaEvaluator();
+//            evaluator.setIgnoreEvalError(true);
+
             assetsGenerator.generateAssets(createAssetList(sheet), auditReport, exhibitBsheet);
             liabilitiesGenerator.generateLiabilities(createLiabilitiesList(sheet), auditReport, exhibitBsheet);
         } catch (IOException ioe) {
@@ -47,7 +50,7 @@ public class ExhibitBGenerator {
             try {
                 inputStream = resource.getInputStream();
                 Workbook workbook = new XSSFWorkbook(inputStream);
-                sheet = workbook.getSheetAt(1);
+                sheet = workbook.getSheetAt(0);
             } catch (IOException ioe) {
                 ioe.printStackTrace();
             } finally {
