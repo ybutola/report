@@ -94,6 +94,10 @@ public class AssetsGenerator {
         DoubleAdder previousYearsCurrentAssetsValue = new DoubleAdder();
         DecimalFormat df = new DecimalFormat("#,###");
 
+        CellStyle style = workbook.createCellStyle();
+        style.setFillForegroundColor(IndexedColors.GREEN.getIndex());
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
         assetList.stream()
                 .filter(asset ->
                         !(asset.getItem().contains("Furniture") || asset.getItem().contains("ROU"))
@@ -104,6 +108,7 @@ public class AssetsGenerator {
 
                     Cell valueCurrentYear = assetRow.createCell(5);
                     Cell valuePrYear = assetRow.createCell(7);
+                    Cell difference = assetRow.createCell(9);
                     valueCurrentYear.setCellStyle(Style.alignRightStyle(workbook));
                     valuePrYear.setCellStyle(Style.alignRightStyle(workbook));
                     long currentYearValue = Math.round(asset.getCurrentYearValue());
@@ -118,6 +123,12 @@ public class AssetsGenerator {
                         valueCurrentYear.setCellValue(df.format(currentYearValue));
                         valuePrYear.setCellValue(df.format(previousYearValue));
                     }
+                    difference.setCellValue(df.format(previousYearValue - currentYearValue));
+                    difference.setCellStyle(style);
+                    difference.removeCellComment();
+
+                    valuePrYear.removeCellComment();
+                    valueCurrentYear.removeCellComment();
                 });
 
         CellStyle topBorderStyle = workbook.createCellStyle();

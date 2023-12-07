@@ -36,7 +36,7 @@ class ExhibitBGeneratorTest {
     @Disabled("TODO: Complete this test")
     void testReadTriaBalance() throws IOException {
         boolean test=true;
-        exhibitBGenerator.readTriaBalance();
+        //exhibitBGenerator.readTriaBalance();
         assert test;
     }
 }
