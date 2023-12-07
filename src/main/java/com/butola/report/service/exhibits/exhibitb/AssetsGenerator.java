@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.DoubleAdder;
 
 @Service
 public class AssetsGenerator {
-    public void generateAssets(List<Asset> assetList,Workbook workbook, Sheet sheet) {
+    public void generateAssets(List<Asset> assetList, Workbook workbook, Sheet sheet) {
         setColumnWidth(sheet);
         generateHeader(workbook, sheet);
         Asset shortTermAsset = generateShortTermAssets(workbook, sheet, assetList);
@@ -31,7 +31,7 @@ public class AssetsGenerator {
         }
     }
 
-    private void setColumnWidth(Sheet sheet){
+    private void setColumnWidth(Sheet sheet) {
         sheet.setColumnWidth(0, 2 * 256);
         sheet.setColumnWidth(1, 2 * 256);
         sheet.setColumnWidth(2, 2 * 256);
@@ -40,6 +40,7 @@ public class AssetsGenerator {
         sheet.setColumnWidth(5, 12 * 256);
         sheet.setColumnWidth(7, 12 * 256);
     }
+
     private void generateHeader(Workbook workbook, Sheet sheet) {
         CellStyle bottomBorderStyle = workbook.createCellStyle();
         bottomBorderStyle.setBorderBottom(BorderStyle.THIN);
@@ -74,7 +75,7 @@ public class AssetsGenerator {
         row_2cell_1.setCellValue("");
 
         Row row_3 = sheet.createRow(3);
-        Cell row_3Cell_1 = row_3.createCell(1); // 9 is the cell column
+        Cell row_3Cell_1 = row_3.createCell(1);
         row_3Cell_1.setCellValue("Current Assets:");
 
         CellRangeAddress currentAssetsMergeRegion = new CellRangeAddress(3, 3, 1, 4);
@@ -93,9 +94,6 @@ public class AssetsGenerator {
         DoubleAdder previousYearsCurrentAssetsValue = new DoubleAdder();
         DecimalFormat df = new DecimalFormat("#,###");
 
-        CellStyle alignRightStyle = workbook.createCellStyle();
-        alignRightStyle.setAlignment(HorizontalAlignment.RIGHT);
-
         assetList.stream()
                 .filter(asset ->
                         !(asset.getItem().contains("Furniture") || asset.getItem().contains("ROU"))
@@ -106,8 +104,8 @@ public class AssetsGenerator {
 
                     Cell valueCurrentYear = assetRow.createCell(5);
                     Cell valuePrYear = assetRow.createCell(7);
-                    valueCurrentYear.setCellStyle(alignRightStyle);
-                    valuePrYear.setCellStyle(alignRightStyle);
+                    valueCurrentYear.setCellStyle(Style.alignRightStyle(workbook));
+                    valuePrYear.setCellStyle(Style.alignRightStyle(workbook));
                     long currentYearValue = Math.round(asset.getCurrentYearValue());
                     long previousYearValue = Math.round(asset.getPreviousYearValue());
                     thisYearsCurrentAssetsValue.add(currentYearValue);
