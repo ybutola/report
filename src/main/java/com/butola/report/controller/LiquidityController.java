@@ -1,7 +1,9 @@
 package com.butola.report.controller;
 
-import com.butola.report.data.mongo.CashFlow;
+import com.butola.report.data.mongo.Liquidity;
+import com.butola.report.data.mongo.Report;
 import com.butola.report.service.dynamiccontent.ReportGenerator;
+import com.butola.report.service.mongodbreport.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,15 +13,20 @@ import java.util.HashMap;
 
 @CrossOrigin
 @RestController
-@RequestMapping("report/word/modifyContent")
-public class WrodController {
+@RequestMapping("report/word/liquidity")
+public class LiquidityController {
     @Autowired
     ReportGenerator reportGenerator;
 
- /*   @CrossOrigin
-    @PostMapping(value = "/liquidity",consumes = "application/json")
-    public ResponseEntity<String> generateReport(@RequestBody Liquidity liquidity) {
+    @Autowired
+    ReportService reportService;
+
+
+    @CrossOrigin
+    @PostMapping(value = "/liquidity", consumes = "application/json")
+    public ResponseEntity<String> generateReport(@RequestBody Liquidity liquidity, @RequestParam String companyName, @RequestParam Integer version) {
         String filepath = "RegularAudit_Template.docx";
+        reportService.createReportWithLiquidity(liquidity, companyName, version);
 
         HashMap<String, Object> replacements = new HashMap<>();
         replacements.put("{cy}", liquidity.currentYear);
@@ -33,23 +40,13 @@ public class WrodController {
 
         reportGenerator.readReplaceAndWrite(filepath, replacements);
         return new ResponseEntity<>("Successfully modified liquidity and availability section.", HttpStatus.OK);
-    }*/
-
-    @PostMapping(value = "/cashflow",consumes = "application/json")
-    public ResponseEntity<String> modifyCashFlowOperatingAdjustments(@RequestBody CashFlow cashFlow) {
-        String filepath = "RegularAudit_Template.docx";
-
-        HashMap<String, Object> replacements = new HashMap<>();
-        replacements.put("{dec}", cashFlow.declaration);
-        replacements.put("{nciola}", cashFlow.netChangeInOperatingLeaseActivity);
-        replacements.put("{losop}", cashFlow.lossOnSaleOfProperty);
-        replacements.put("{ap}", cashFlow.amountsPayable);
-        replacements.put("{acexp}", cashFlow.accruedExpenses);
-        replacements.put("{gacr}", cashFlow.grantsAndContractsReceivable);
-        replacements.put("{pe}", cashFlow.prepaidExpenses);
-        replacements.put("{ta}", cashFlow.totalAdjustments);
-
-        reportGenerator.readReplaceAndWrite(filepath, replacements);
-        return new ResponseEntity<>("Successfully modified Cash Flow Operating Adjustments section.", HttpStatus.OK);
     }
+
+    @CrossOrigin
+    @GetMapping("/findLiquidity")
+    public ResponseEntity<Liquidity> getLiquidity(@RequestParam String companyName, @RequestParam Integer version, @RequestParam Integer year) {
+        Report report = reportService.getReport(companyName, version, year);
+        return new ResponseEntity<>(report.getLiquidity(), HttpStatus.OK);
+    }
+
 }
