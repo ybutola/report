@@ -1,11 +1,12 @@
-package com.butola.report.service.exhibits.exhibitb;
+package com.butola.report.service.exhibits.exhibitc;
 
 import com.butola.report.data.Asset;
 import com.butola.report.data.Liability;
 import com.butola.report.service.exhibits.exhibitb.AssetsGenerator;
 import com.butola.report.service.exhibits.exhibitb.LiabilitiesGenerator;
-import com.butola.report.utility.Excel;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -18,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class ExhibitBGenerator {
+public class ExhibitCGenerator {
     @Autowired
     ResourceLoader resourceLoader;
 
@@ -32,11 +33,9 @@ public class ExhibitBGenerator {
         try {
             Sheet sheet = readTrialBalance();
             Sheet exhibitBsheet = auditReport.createSheet("exhibit B");
-//            FormulaEvaluator evaluator = auditReport.getCreationHelper().createFormulaEvaluator();
-//            evaluator.setIgnoreEvalError(true);
 
             assetsGenerator.generateAssets(createAssetList(sheet), auditReport, exhibitBsheet);
-            liabilitiesGenerator.generateLiabilities(createLiabilitiesList(sheet), auditReport, exhibitBsheet);
+        //    liabilitiesGenerator.generateLiabilities(createLiabilitiesList(sheet), auditReport, exhibitBsheet);
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
@@ -63,8 +62,7 @@ public class ExhibitBGenerator {
 
     private List<Asset> createAssetList(Sheet sheet) {
         List<Asset> assetList = new ArrayList<>();
-        //      Row row = sheet.getRow(11);
-        Row row = sheet.getRow(Excel.findRowNumber("Cash", sheet));
+        Row row = sheet.getRow(11);
         String assetItem = row.getCell(0).getStringCellValue();
 
         if (assetItem.contains("Cash")) {
@@ -121,8 +119,7 @@ public class ExhibitBGenerator {
 
     private List<Liability> createLiabilitiesList(Sheet sheet) {
         List<Liability> liabilities = new ArrayList<>();
-        //Row row = sheet.getRow(30);
-        Row row = sheet.getRow(Excel.findRowNumber("Accounts Payable", sheet));
+        Row row = sheet.getRow(30);
         String item = row.getCell(0).getStringCellValue();
 
         if (item.contains("Accounts Payable")) {
@@ -133,8 +130,7 @@ public class ExhibitBGenerator {
             liabilities.add(liability);
         }
 
-        // row = sheet.getRow(34);
-        row = sheet.getRow(Excel.findRowNumber("Accrued Salaries and Vacation", sheet));
+        row = sheet.getRow(34);
         item = row.getCell(0).getStringCellValue();
 
         if (item.contains("Accrued Salaries and Vacation")) {
@@ -145,8 +141,7 @@ public class ExhibitBGenerator {
             liabilities.add(liability);
         }
 
-        // row = sheet.getRow(38);
-        row = sheet.getRow(Excel.findRowNumber("Other Liabilities", sheet));
+        row = sheet.getRow(38);
         item = row.getCell(0).getStringCellValue();
 
         if (item.contains("Other Liabilities")) {

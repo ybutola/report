@@ -18,7 +18,7 @@ public class CashFlowController {
 
     @CrossOrigin
     @PostMapping(value = "/saveCashflow", consumes = "application/json")
-    public ResponseEntity<String> generateReport(@RequestBody CashFlow cashFlow,
+    public ResponseEntity<String> saveCashFlow(@RequestBody CashFlow cashFlow,
                                                  @RequestParam String companyName,
                                                  @RequestParam Integer version,
                                                  @RequestParam Integer year) {
@@ -29,7 +29,7 @@ public class CashFlowController {
 
     @CrossOrigin
     @GetMapping("/findCashflow")
-    public ResponseEntity<CashFlow> getLiquidity(@RequestParam String companyName,
+    public ResponseEntity<CashFlow> findCashFlow(@RequestParam String companyName,
                                                  @RequestParam Integer version,
                                                  @RequestParam Integer year) {
         Report report = reportService.getReport(companyName, version, year);

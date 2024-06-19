@@ -20,7 +20,7 @@ public class LiabilitiesGenerator {
     void generateLiabilities(List<Liability> liabilities, Workbook workbook, Sheet sheet) {
         generateHeader(workbook, sheet);
         generateShortTermLiabilities(workbook, sheet, liabilities);
-        //   generateLongTermLiabilities(workbook, sheet, liabilities);
+        generateLongTermLiabilities(workbook, sheet, liabilities);
 
         try (FileOutputStream outputStream = new FileOutputStream("Metronet2023 - Audit Report.xlsx")) {
             workbook.write(outputStream);
@@ -46,7 +46,6 @@ public class LiabilitiesGenerator {
         Row row_22 = sheet.createRow(18);
         Cell row_22Cell_1 = row_22.createCell(1);
         row_22Cell_1.setCellValue("Current Liabilities:");
-
 
         CellRangeAddress currentLiabilitiesMergeRegion = new CellRangeAddress(18, 18, 1, 4);
         sheet.addMergedRegion(currentLiabilitiesMergeRegion);
@@ -84,6 +83,9 @@ public class LiabilitiesGenerator {
                         valueCurrentYear.setCellValue(df.format(currentYearValue));
                         valuePrYear.setCellValue(df.format(previousYearValue));
                     }
+                    valueCurrentYear.removeCellComment();
+                    valuePrYear.removeCellComment();
+                    Style.createDifferenceCell(liabilityRow, workbook, previousYearValue, currentYearValue);
                 });
 
         CellStyle topBorderStyle = workbook.createCellStyle();
@@ -114,10 +116,10 @@ public class LiabilitiesGenerator {
         Row row_9 = sheet.createRow(9);
 
         CellRangeAddress currentLiabilitysMergeRegion = new CellRangeAddress(9, 9, 1, 4);
-        sheet.addMergedRegion(currentLiabilitysMergeRegion);
+       // sheet.addMergedRegion(currentLiabilitysMergeRegion);
 
         CellRangeAddress LiabilitysMergeRegion_1 = new CellRangeAddress(10, 10, 1, 4);
-        sheet.addMergedRegion(LiabilitysMergeRegion_1);
+      //  sheet.addMergedRegion(LiabilitysMergeRegion_1);
 
         AtomicInteger rowNumber = new AtomicInteger(9);
         DoubleAdder thisYearsCurrentLiabilitysValue = new DoubleAdder();
@@ -151,6 +153,8 @@ public class LiabilitiesGenerator {
                         valueCurrentYear.setCellValue(df.format(currentYearValue));
                         valuePrYear.setCellValue(df.format(previousYearValue));
                     }
+                    valueCurrentYear.removeCellComment();
+                    Style.createDifferenceCell(liabilityRow, workbook, previousYearValue, currentYearValue);
                 });
 
         Row row_11 = sheet.createRow(11);

@@ -2,7 +2,9 @@ package com.butola.report.service.mongodbreport;
 
 import com.butola.report.data.mongo.CashFlow;
 import com.butola.report.data.mongo.Liquidity;
+import com.butola.report.data.mongo.Org;
 import com.butola.report.data.mongo.Report;
+import com.butola.report.repository.ReportCollectionRepository;
 import com.butola.report.repository.ReportRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,13 +15,15 @@ public class ReportService {
     @Autowired
     ReportRepository reportRepository;
 
+    @Autowired
+    ReportCollectionRepository reportCollection;
     public void createReportWithLiquidity(Liquidity liquidity, String companyName, int version) {
-        Report report = reportRepository.findByCompanyName(companyName, version, liquidity.currentYear);
+        Report report = reportRepository.findByCompanyName(companyName, version, liquidity.getCurrentYear());
         if (report == null) {
             Report newReport = new Report();
             newReport.setCompanyName(companyName);
             newReport.setVersion(version);
-            newReport.setYear(liquidity.currentYear);
+            newReport.setYear(liquidity.getCurrentYear());
             newReport.setLiquidity(liquidity);
             reportRepository.save(newReport);
         } else {
@@ -41,6 +45,14 @@ public class ReportService {
             report.setCashFlow(cashFlow);
             reportRepository.save(report);
         }
+    }
+
+    public void saveOrgInfo(Org org) {
+        Report newReport = new Report();
+        newReport.setCompanyName(org.getCompanyName());
+        newReport.setYear(org.getAssessmentYear());
+        newReport.setVersion(1);
+        reportCollection.saveReportCollection(newReport);
     }
 
     public Report getReport(String companyName, int version, int year){

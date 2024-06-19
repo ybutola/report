@@ -14,6 +14,7 @@ public class ExhibitBTest {
 
     @Autowired
     AuditReportGenerator auditReportGenerator;
+
     @Test
     void testExhibitB() {
         try {

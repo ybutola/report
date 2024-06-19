@@ -3,6 +3,8 @@ package com.butola.report.utility;
 import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.ss.usermodel.*;
 
+import java.text.DecimalFormat;
+
 public class Style {
     public static Font getUnderlineFont(Workbook workbook) {
         Font underlineFont = workbook.createFont();
@@ -16,7 +18,18 @@ public class Style {
         return alignRightStyle;
     }
 
-    public void removeCellComment(Cell cell){
-        cell.removeCellComment();
+    public static CellStyle greenBackground(Workbook workbook){
+        CellStyle style = workbook.createCellStyle();
+        style.setFillForegroundColor(IndexedColors.GREEN.getIndex());
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        return style;
+    }
+
+    public static void createDifferenceCell(Row row, Workbook workbook ,  long previousYearValue, long currentYearValue){
+        DecimalFormat df = new DecimalFormat("#,###");
+        Cell difference = row.createCell(9);
+        difference.setCellValue(df.format(previousYearValue - currentYearValue));
+        difference.setCellStyle(greenBackground(workbook));
+        difference.removeCellComment();
     }
 }

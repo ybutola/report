@@ -5,13 +5,13 @@ import lombok.Data;
 @Data
 public class CashFlow {
 
-    public long declaration;
-    public long netChangeInOperatingLeaseActivity;
-    public long lossOnSaleOfProperty;
-    public long amountsPayable;
-    public long accruedExpenses;
-    public long grantsAndContractsReceivable;
-    public long prepaidExpenses;
-    public long totalAdjustments;
+    private long declaration;
+    private long netChangeInOperatingLeaseActivity;
+    private long lossOnSaleOfProperty;
+    private long amountsPayable;
+    private long accruedExpenses;
+    private long grantsAndContractsReceivable;
+    private long prepaidExpenses;
+    private long totalAdjustments;
 
 }

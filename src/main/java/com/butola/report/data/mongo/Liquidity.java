@@ -5,12 +5,12 @@ import org.springframework.data.annotation.Id;
 
 @Data
 public class Liquidity {
-    public int currentYear;
-    public long currentYearCash;
-    public long currentYearGrantsAndContractsReceivable;
-    public long currentYearTotalFinancialAssets;
-    public long totalAssetsWithDonorRestrictions;
-    public long netAssetsWithRestrictions;
-    public long totalAssetsNotAvailable;
-    public long financialAssetsAvailable;
+    private int currentYear;
+    private long currentYearCash;
+    private long currentYearGrantsAndContractsReceivable;
+    private long currentYearTotalFinancialAssets;
+    private long totalAssetsWithDonorRestrictions;
+    private long netAssetsWithRestrictions;
+    private long totalAssetsNotAvailable;
+    private long financialAssetsAvailable;
 }
