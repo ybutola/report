@@ -3,22 +3,19 @@ package com.butola.report.service.mongodbreport;
 import com.butola.report.data.mongo.CashFlow;
 import com.butola.report.data.mongo.Liquidity;
 import com.butola.report.data.mongo.Report;
-import com.mongodb.client.gridfs.model.GridFSFile;
-import com.mongodb.client.gridfs.model.GridFSUploadOptions;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
-import org.bson.types.ObjectId;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTR;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,11 +26,11 @@ public class ReportGeneratorService {
     ResourceLoader resourceLoader;
 
     @Autowired
-    private GridFsTemplate gridFsTemplate;
+    GridFsFileService gridFsFileService;
     @Autowired
     ReportService reportService;
 
-    public byte[] generatePreview(String companyName, int version, int year) {
+    public byte[] generatePreview(String templateName, String companyName, int version, int year) {
         String filepath = "RegularAudit_Template.docx";
         HashMap<String, Object> replacements = new HashMap<>();
         Report report = reportService.getReport(companyName, version, year);
@@ -58,12 +55,13 @@ public class ReportGeneratorService {
         replacements.put("{pe}", cashFlow.getPrepaidExpenses());
         replacements.put("{ta}", cashFlow.getTotalAdjustments());
 
-        return readReplaceAndWrite(filepath, replacements);
+        return readReplaceAndWrite(filepath, templateName, replacements);
     }
 
-    private byte[] readReplaceAndWrite(String filepath, HashMap<String, Object> replacements) {
+    private byte[] readReplaceAndWrite(String filepath, String templateName, HashMap<String, Object> replacements) {
         try {
-            XWPFDocument document = readDocument(filepath);
+            // XWPFDocument document = readDocument(filepath);
+            XWPFDocument document = readTemplateDocument(templateName);
             return replaceText(document, replacements);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -85,6 +83,20 @@ public class ReportGeneratorService {
             } finally {
                 inputStream.close();
             }
+        }
+        return null;
+    }
+
+    private XWPFDocument readTemplateDocument(String templateName) throws IOException {
+        InputStream inputStream = null;
+        try {
+            inputStream = gridFsFileService.findDocument(templateName);
+            XWPFDocument doc = new XWPFDocument(inputStream);
+            return doc;
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        } finally {
+            inputStream.close();
         }
         return null;
     }
@@ -131,31 +143,15 @@ public class ReportGeneratorService {
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             doc.write(outputStream);
-            //doc.write(new FileOutputStream("replaceContent_1.docx")); Use it if you want to write to a file.
-            saveDocumentToMongoDB(outputStream.toByteArray());
-            return outputStream.toByteArray();
+            String previewFileName = "butolaorg_1_2024_preview";
+            byte[] content = outputStream.toByteArray();
+            gridFsFileService.replaceDocument(previewFileName, content);
+            return content;
         } catch (FileNotFoundException fnfe) {
             fnfe.printStackTrace();
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
         return null;
-    }
-
-    /**
-     * @param content
-     * @return In preview mode, no need to keep multiple versions of the same file.
-     * Also no need to first check if a file exists.
-     */
-    public String saveDocumentToMongoDB(byte[] content) {
-        String previewFileName = "butolaorg_1_2024_preview";
-        gridFsTemplate.delete(new Query(Criteria.where("filename").is(previewFileName)));
-
-        InputStream inputStream = new ByteArrayInputStream(content);
-        GridFSUploadOptions options = new GridFSUploadOptions()
-                .metadata(new org.bson.Document("type", "document").append("fileName", previewFileName));
-
-        ObjectId fileId = gridFsTemplate.store(inputStream, previewFileName, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", options);
-        return fileId.toString();
     }
 }

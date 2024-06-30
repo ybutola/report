@@ -8,6 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @CrossOrigin
 @RestController
 @RequestMapping("report/word/cashflow")
@@ -18,13 +21,15 @@ public class CashFlowController {
 
     @CrossOrigin
     @PostMapping(value = "/saveCashflow", consumes = "application/json")
-    public ResponseEntity<String> saveCashFlow(@RequestBody CashFlow cashFlow,
-                                                 @RequestParam String companyName,
-                                                 @RequestParam Integer version,
-                                                 @RequestParam Integer year) {
+    public ResponseEntity<Map<String, String>> saveCashFlow(@RequestBody CashFlow cashFlow,
+                                                            @RequestParam String companyName,
+                                                            @RequestParam Integer version,
+                                                            @RequestParam Integer year) {
         String filepath = "RegularAudit_Template.docx";
         reportService.createReportWithCashflow(cashFlow, companyName, version, year);
-        return new ResponseEntity<>("Successfully added/updated Cashflow object.", HttpStatus.OK);
+        Map<String, String> map = new HashMap();
+        map.put("message", "Successfully added/updated Cashflow object.");
+        return new ResponseEntity<>(map, HttpStatus.OK);
     }
 
     @CrossOrigin

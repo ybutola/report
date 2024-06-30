@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.Map;
 
 @CrossOrigin
 @RestController
@@ -22,10 +23,12 @@ public class LiquidityController {
     ReportService reportService;
 
     @CrossOrigin
-    @PostMapping(value = "/liquidity", consumes = "application/json")
-    public ResponseEntity<String> saveLiquidity(@RequestBody Liquidity liquidity, @RequestParam String companyName, @RequestParam Integer version) {
+    @PostMapping(value = "/saveLiquidity", consumes = "application/json")
+    public ResponseEntity<Map<String, String>> saveLiquidity(@RequestBody Liquidity liquidity, @RequestParam String companyName, @RequestParam Integer version) {
         reportService.createReportWithLiquidity(liquidity, companyName, version);
-        return new ResponseEntity<>("Successfully modified liquidity and availability section.", HttpStatus.OK);
+        Map<String, String> map = new HashMap();
+        map.put("message", "Successfully modified liquidity and availability section.");
+        return new ResponseEntity<>(map, HttpStatus.OK);
     }
 
     @CrossOrigin

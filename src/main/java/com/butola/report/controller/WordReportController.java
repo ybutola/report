@@ -16,10 +16,11 @@ public class WordReportController {
 
     @CrossOrigin
     @GetMapping(value = "/preview")
-    public ResponseEntity<byte[]> previewReport(@RequestParam String companyName,
+    public ResponseEntity<byte[]> previewReport(@RequestParam String templateName,
+                                                @RequestParam String companyName,
                                                 @RequestParam Integer version,
                                                 @RequestParam Integer year) {
-        byte[] documentBytes = reportGenerator.generatePreview(companyName, version, year);
+        byte[] documentBytes = reportGenerator.generatePreview(templateName, companyName, version, year);
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "attachment; filename=document.docx");
         headers.add("Content-Type", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
@@ -28,10 +29,11 @@ public class WordReportController {
 
     @CrossOrigin
     @GetMapping(value = "/generate", consumes = "application/json")
-    public ResponseEntity<String> generateReport(@RequestParam String companyName,
+    public ResponseEntity<String> generateReport(@RequestParam String templateName,
+                                                 @RequestParam String companyName,
                                                  @RequestParam Integer version,
                                                  @RequestParam Integer year) {
-        reportGenerator.generatePreview(companyName, version, year);
+        reportGenerator.generatePreview(templateName, companyName, version, year);
         return new ResponseEntity<>("Successfully modified liquidity and availability section.", HttpStatus.OK);
     }
 }

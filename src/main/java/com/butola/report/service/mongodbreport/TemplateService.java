@@ -2,24 +2,19 @@ package com.butola.report.service.mongodbreport;
 
 import com.butola.report.data.SearchTemplateData;
 import com.butola.report.data.mongo.Template;
+import com.butola.report.exceptions.FileReadException;
 import com.butola.report.exceptions.TemplateAlreadyExistsException;
 import com.butola.report.repository.TemplateRepository;
-
-import com.butola.report.repository.TemplateRepositoryCustom;
-import com.mongodb.MongoWriteException;
-import com.mongodb.client.gridfs.model.GridFSUploadOptions;
-import org.bson.types.ObjectId;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.DuplicateFormatFlagsException;
 import java.util.List;
 
 @Service
@@ -27,36 +22,35 @@ public class TemplateService {
 
     @Autowired
     TemplateRepository templateRepository;
+
     @Autowired
-    private GridFsTemplate gridFsTemplate;
+    GridFsFileService gridFsFileService;
 
     public void saveTemplate(String companyName, Integer year, Integer version, byte[] content) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy");
+
         Template template = new Template();
         template.setCompanyName(companyName);
         template.setYear(year);
         template.setVersion(version);
         template.setCreatedBy("ybutola");
-        template.setCreatedDate(new Date());
+
         String fileName = companyName + "_" + year + "_" + version;
         template.setFileName(fileName);
         try {
+            template.setCreatedDate(simpleDateFormat.parse(simpleDateFormat.format(new Date())));
             templateRepository.save(template);
-            saveFile(fileName, content);
+            gridFsFileService.saveDocument(fileName, content);
         } catch (DuplicateKeyException dke) {
             throw new TemplateAlreadyExistsException(companyName, year, version);
+        } catch (ParseException pex) {
+            pex.printStackTrace();
+            ;
+            //Log the error.
         }
     }
 
-    private boolean saveFile(String fileName, byte[] content) {
-        InputStream inputStream = new ByteArrayInputStream(content);
-        GridFSUploadOptions options = new GridFSUploadOptions()
-                .metadata(new org.bson.Document("type", "document").append("fileName", fileName));
-
-        ObjectId fileId = gridFsTemplate.store(inputStream, fileName, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", options);
-        return true;
-    }
-
-    public List<Template> findTemplate(SearchTemplateData data) {
+    public List<Template> findTemplates(SearchTemplateData data) {
         return templateRepository.searchTemplates(
                 data.getCompanyName(),
                 data.getYear(),
@@ -66,5 +60,18 @@ public class TemplateService {
                 data.getCreatedDate(),
                 data.getUpdatedDate()
         );
+    }
+
+    public byte[] findTemplate(String companyName,
+                               Integer version,
+                               Integer year) {
+        String fileName = companyName + "_" + year + "_" + version;
+        try {
+            InputStream inputStream = gridFsFileService.findDocument(fileName);
+            return IOUtils.toByteArray(inputStream);
+        } catch (IOException ioex) {
+            // Log the error.
+            throw new FileReadException(fileName);
+        }
     }
 }
