@@ -3,10 +3,12 @@ package com.butola.report.service.mongodbreport;
 import com.butola.report.data.mongo.CashFlow;
 import com.butola.report.data.mongo.Liquidity;
 import com.butola.report.data.mongo.Report;
-import org.apache.poi.xwpf.usermodel.XWPFDocument;
-import org.apache.poi.xwpf.usermodel.XWPFParagraph;
-import org.apache.poi.xwpf.usermodel.XWPFRun;
+import com.butola.report.data.mongo.mapping.CashflowMappingConstants;
+import com.butola.report.data.mongo.mapping.LiquidityMappingConstants;
+import org.apache.poi.xwpf.usermodel.*;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTR;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTcBorders;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.STBorder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -30,37 +32,91 @@ public class ReportGeneratorService {
     @Autowired
     ReportService reportService;
 
+    @Autowired
+    GenerateLiquidity generateLiquidity;
+
+    @Autowired
+    GenerateCashflow generateCashflow;
+
     public byte[] generatePreview(String templateName, String companyName, int version, int year) {
-        String filepath = "RegularAudit_Template.docx";
-        HashMap<String, Object> replacements = new HashMap<>();
+/*        HashMap<String, Object> replacements = new HashMap<>();
         Report report = reportService.getReport(companyName, version, year);
 
-        Liquidity liquidity = report.getLiquidity();
-        replacements.put("{cy}", liquidity.getCurrentYear());
-        replacements.put("{cyc}", liquidity.getCurrentYearCash());
-        replacements.put("{cygacr}", liquidity.getCurrentYearGrantsAndContractsReceivable());
-        replacements.put("{cytfa}", liquidity.getCurrentYearTotalFinancialAssets());
-        replacements.put("{tawdr}", liquidity.getTotalAssetsWithDonorRestrictions());
-        replacements.put("{nawr}", liquidity.getNetAssetsWithRestrictions());
-        replacements.put("{tana}", liquidity.getTotalAssetsNotAvailable());
-        replacements.put("{faa}", liquidity.getFinancialAssetsAvailable());
 
-        CashFlow cashFlow = report.getCashFlow();
-        replacements.put("{dec}", cashFlow.getDeclaration());
-        replacements.put("{nciola}", cashFlow.getNetChangeInOperatingLeaseActivity());
-        replacements.put("{losop}", cashFlow.getLossOnSaleOfProperty());
-        replacements.put("{ap}", cashFlow.getAmountsPayable());
-        replacements.put("{acexp}", cashFlow.getAccruedExpenses());
-        replacements.put("{gacr}", cashFlow.getGrantsAndContractsReceivable());
-        replacements.put("{pe}", cashFlow.getPrepaidExpenses());
-        replacements.put("{ta}", cashFlow.getTotalAdjustments());
+        Liquidity liquidity = reports[0].getLiquidity();
+        replacements.put(LiquidityMappingConstants.currentYear, liquidity.getCurrentYear());
+        replacements.put(LiquidityMappingConstants.currentYearCash, liquidity.getCurrentYearCash());
+        replacements.put(LiquidityMappingConstants.currentYearGrantsAndContractsReceivable, liquidity.getCurrentYearGrantsAndContractsReceivable());
+        replacements.put(LiquidityMappingConstants.currentYearTotalFinancialAssets, liquidity.getCurrentYearTotalFinancialAssets());
+        replacements.put(LiquidityMappingConstants.totalAssetsWithDonorRestrictions, liquidity.getTotalAssetsWithDonorRestrictions());
+        replacements.put(LiquidityMappingConstants.netAssetsWithRestrictions, liquidity.getNetAssetsWithRestrictions());
+        replacements.put(LiquidityMappingConstants.totalAssetsNotAvailable, liquidity.getTotalAssetsNotAvailable());
+        replacements.put(LiquidityMappingConstants.getFinancialAssetsAvailable, liquidity.getFinancialAssetsAvailable());
 
-        return readReplaceAndWrite(filepath, templateName, replacements);
+        CashFlow cashFlow = reports[0].getCashFlow();
+        replacements.put(CashflowMappingConstants.declaration, cashFlow.getDeclaration());
+        replacements.put(CashflowMappingConstants.netChangeInOperatingLeaseActivity, cashFlow.getNetChangeInOperatingLeaseActivity());
+        replacements.put(CashflowMappingConstants.lossOnSaleOfProperty, cashFlow.getLossOnSaleOfProperty());
+        replacements.put(CashflowMappingConstants.amountsPayable, cashFlow.getAccountsPayable());
+        replacements.put(CashflowMappingConstants.accruedExpenses, cashFlow.getAccruedExpenses());
+        replacements.put(CashflowMappingConstants.grantsAndContractsReceivable, cashFlow.getGrantsAndContractsReceivable());
+        replacements.put(CashflowMappingConstants.prepaidExpenses, cashFlow.getPrepaidExpenses());
+        replacements.put(CashflowMappingConstants.totalAdjustments, cashFlow.getTotalAdjustments());*/
+
+        //return readReplaceAndWrite(templateName, replacements);
+        //return createDocument(companyName, version, year);
+
+        Report[] reports = reportService.getReports(companyName, version, year);
+        return createDocument(reports);
     }
 
-    private byte[] readReplaceAndWrite(String filepath, String templateName, HashMap<String, Object> replacements) {
+    private byte[] createDocument(Report[] reports) {
+        XWPFDocument document = new XWPFDocument();
+        generateLiquidity.createLiquidity(document, reports[0], reports[1]);
+        generateCashflow.createCashflow(document, reports[0], reports[1]);
+        return createDocWithReplacedContent(document);
+    }
+    private byte[] createDocument(String companyName, int version, int year) {
+        XWPFDocument document = new XWPFDocument();
+        Report currentYearReport = reportService.getReport(companyName, version, year);
+        Report previousYearReport = reportService.getReport(companyName, version, year-1);
+        generateLiquidity.createLiquidity(document, currentYearReport, previousYearReport);
+        generateCashflow.createCashflow(document, currentYearReport, previousYearReport);
+        return createDocWithReplacedContent(document);
+    }
+
+    private byte[] createDocWithReplacedContent(XWPFDocument doc) {
         try {
-            // XWPFDocument document = readDocument(filepath);
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            doc.write(outputStream);
+            String previewFileName = "butolaorg_1_2024_preview";
+            byte[] content = outputStream.toByteArray();
+            gridFsFileService.replaceDocument(previewFileName, content);
+            return content;
+        } catch (FileNotFoundException fnfe) {
+            fnfe.printStackTrace();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+        return null;
+    }
+
+    /**************************************************************************************************************************************/
+
+    private void replaceText(XWPFParagraph paragraph, String text, HashMap<String, Object> replacements, XWPFRun run, int pos) {
+        if (text != null) {
+            for (Map.Entry<String, Object> entry : replacements.entrySet()) {
+                if (text.contains(entry.getKey())) {
+                    text = text.replace(entry.getKey(), entry.getValue().toString());
+                    run.setText(text, pos);
+                    break;
+                }
+            }
+        }
+    }
+
+    private byte[] readReplaceAndWrite(String templateName, HashMap<String, Object> replacements) {
+        try {
             XWPFDocument document = readTemplateDocument(templateName);
             return replaceText(document, replacements);
         } catch (Exception ex) {
@@ -68,7 +124,6 @@ public class ReportGeneratorService {
         }
         return null;
     }
-
     private XWPFDocument readDocument(String filePath) throws IOException {
         Resource resource = resourceLoader.getResource("classpath:" + filePath);
 
@@ -102,56 +157,27 @@ public class ReportGeneratorService {
     }
 
     private byte[] replaceText(XWPFDocument doc, HashMap<String, Object> replacements) {
-        for (XWPFParagraph paragraph : doc.getParagraphs()) {
+
+       for (XWPFParagraph paragraph : doc.getParagraphs()) {
             for (XWPFRun run : paragraph.getRuns()) {
                 int size = getRunSize(run);
 
                 if (size == 1) {
                     String text = run.getText(0);
-                    replaceText(text, replacements, run, 0);
+                    replaceText(paragraph, text, replacements, run, 0);
                 } else {
                     String text = "";
                     for (int i = 0; i < size; i++) {
                         text = run.getText(i);
-                        replaceText(text, replacements, run, i);
+                        replaceText(paragraph, text, replacements, run, i);
                     }
                 }
             }
         }
-
         return createDocWithReplacedContent(doc);
     }
-
-    private void replaceText(String text, HashMap<String, Object> replacements, XWPFRun run, int pos) {
-        if (text != null) {
-            for (Map.Entry<String, Object> entry : replacements.entrySet()) {
-                if (text.contains(entry.getKey())) {
-                    text = text.replace(entry.getKey(), entry.getValue().toString());
-                    break;
-                }
-            }
-            run.setText(text, pos);
-        }
-    }
-
     private static int getRunSize(XWPFRun run) {
         CTR ctr = run.getCTR();
         return ctr.sizeOfTArray();
-    }
-
-    private byte[] createDocWithReplacedContent(XWPFDocument doc) {
-        try {
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            doc.write(outputStream);
-            String previewFileName = "butolaorg_1_2024_preview";
-            byte[] content = outputStream.toByteArray();
-            gridFsFileService.replaceDocument(previewFileName, content);
-            return content;
-        } catch (FileNotFoundException fnfe) {
-            fnfe.printStackTrace();
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-        }
-        return null;
     }
 }

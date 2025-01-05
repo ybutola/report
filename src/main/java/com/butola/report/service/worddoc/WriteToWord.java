@@ -17,7 +17,7 @@ public class WriteToWord {
     @Autowired
     WriteHeader writeHeader;
     String excelFilePath = "input.xlsx"; // Provide the path to your Excel file
-    String wordFilePath = "output.docx"; // Provide the path for the output Word document
+    String wordFilePath = "outputNew.docx"; // Provide the path for the output Word document
 
     public void writeToWord() throws IOException {
         XWPFDocument document = new XWPFDocument();

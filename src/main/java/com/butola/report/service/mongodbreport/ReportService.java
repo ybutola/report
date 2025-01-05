@@ -17,6 +17,12 @@ public class ReportService {
 
     @Autowired
     ReportCollectionRepository reportCollection;
+
+    public void createReport(Report report) {
+        reportRepository.save(report);
+
+    }
+
     public void createReportWithLiquidity(Liquidity liquidity, String companyName, int version) {
         Report report = reportRepository.findByCompanyName(companyName, version, liquidity.getCurrentYear());
         if (report == null) {
@@ -55,8 +61,16 @@ public class ReportService {
         reportCollection.saveReportCollection(newReport);
     }
 
-    public Report getReport(String companyName, int version, int year){
+    public Report getReport(String companyName, int version, int year) {
         Report report = reportRepository.findByCompanyName(companyName, version, year);
         return report;
+    }
+
+
+    public Report[] getReports(String companyName, int version, int year) {
+        Report currentYearReport = reportRepository.findByCompanyName(companyName, version, year);
+        Report prevoiusYearReport = reportRepository.findByCompanyName(companyName, version, year - 1);
+        Report[] reports = {currentYearReport, prevoiusYearReport};
+        return reports;
     }
 }

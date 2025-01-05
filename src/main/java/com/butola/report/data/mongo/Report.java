@@ -17,6 +17,11 @@ public class Report {
     private String companyName;
     private int year;
     private int version = 1;
+    private Property property;
+    private ContributionsOfNonFinancialAssets contributionsOfNonFinancialAssets;
+    private NetAssetsWithDonorRestrictions netAssetsWithDonorRestrictions;
+    private BoardDesignatedNetAssets boardDesignatedNetAssets;
+    private Lease lease;
     private Liquidity liquidity;
     private CashFlow cashFlow;
     private Audit audit;
